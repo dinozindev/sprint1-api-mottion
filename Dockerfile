@@ -21,7 +21,5 @@ COPY --from=build /app/out .
 # Porta da API
 EXPOSE 5147
 
-ENV ASPNETCORE_URLS=http://+:5147
-
 # Comando para iniciar a aplicação
 ENTRYPOINT ["dotnet", "Sprint1-API.dll"]

@@ -9,10 +9,6 @@ using Sprint1_API;
 using Sprint1_API.Dto;
 using Sprint1_API.Model;
 
-// TO DO
-// testar SignalR no Front
-// terminar README.md
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<AppDbContext>(options => 
@@ -49,10 +45,8 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSignalR();
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(5147);
-});
+// usado para poder acessar a API tanto localmente quanto pela Azure
+builder.WebHost.UseUrls("http://localhost:5147","http://0.0.0.0:5147");
 
 var app = builder.Build();
 
