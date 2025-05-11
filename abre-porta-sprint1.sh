@@ -1,0 +1,1 @@
+az vm open-port --resource-group rg-sprint1-api-mottion-2tdsb-brazilsouth --name vm-sprint1-api-mottion-2tdsb-brazilsouth --port 5147 --priority 1010
