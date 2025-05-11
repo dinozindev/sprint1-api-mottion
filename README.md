@@ -135,13 +135,9 @@ Response Body:
 Códigos de Resposta
 
 | Código HTTP | Significado                     | Quando ocorre                                             |
-
 |-------------|----------------------------------|-----------------------------------------------------------|
-
 | 200 OK      | Requisição bem-sucedida         | Quando há clientes cadastrados                            |
-
 | 204 No Content | Sem conteúdo a retornar      | Quando não há clientes cadastrados                        |
-
 | 500 Internal Server Error | Erro interno     | Quando ocorre uma falha inesperada no servidor            |
 
 - #### Retorna um cliente pelo ID
