@@ -1,3 +1,4 @@
+
 # Mottu Mottion - API
 
 ## Descrição do Projeto
@@ -1016,4 +1017,91 @@ Códigos de Resposta
 | 204 No Content    | Sem conteúdo a retornar         | Quando a atualização da data de saída da movimentação é válida, mas não há dados para retornar   |
 | 400 Bad Request   | Requisição malformada           | Quando os dados enviados estão incorretos ou incompletos       |
 | 404 Not Found     | Recurso não encontrado          | Quando a movimentação especificada não é encontrada                |
-| 500 Internal Server Error | Erro interno             | Quando ocorre uma falha inesperada no servidor                 
+| 500 Internal Server Error | Erro interno             | Quando ocorre uma falha inesperada no servidor                 |
+
+## Dockerfile
+
+### Estrutura do Dockerfile para a matéria de DEVOPS TOOLS & CLOUD COMPUTING:
+
+```
+# Etapa 1: build da aplicação
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /app
+
+# Copia os arquivos de projeto e restaura as dependências
+COPY Sprint1-API/Sprint1-API.csproj ./Sprint1-API/
+RUN dotnet restore ./Sprint1-API/Sprint1-API.csproj
+
+# Copia os demais arquivos e compila a aplicação
+COPY Sprint1-API/ ./Sprint1-API/
+WORKDIR /app/Sprint1-API
+RUN dotnet publish -c Release -o /app/out
+
+# Etapa 2: runtime
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
+WORKDIR /app
+
+# Copia a aplicação compilada da etapa anterior
+COPY --from=build /app/out .
+
+# Porta da API
+EXPOSE 5147
+
+# Comando para iniciar a aplicação
+ENTRYPOINT ["dotnet", "Sprint1-API.dll"]
+```
+
+## Scripts do Azure CLI
+
+### Criação da VM:
+
+```
+UBUNTU="Canonical:ubuntu-24_04-lts:server:24.04.202502210"
+VM_SIZE="Standard_B2s"
+TASK="1"
+LOCATION="brazilsouth"
+
+az group create -g rg-sprint1-api-mottion-2tdsb-$LOCATION -l $LOCATION --tags Sprint=$TASK
+
+az network vnet create -n vnet-sprint1-api-mottion-2tdsb-$LOCATION -g rg-sprint1-api-mottion-2tdsb-$LOCATION --tags Sprint=$TASK
+
+az network vnet subnet create -n snet-sprint1-api-mottion-2tdsb-main -g rg-sprint1-api-mottion-2tdsb-$LOCATION --vnet-name vnet-sprint1-api-mottion-2tdsb-$LOCATION --address-prefixes 10.0.0.0/24
+
+az network nsg create -n nsg-sprint1-api-mottion-2tdsb-$LOCATION -g rg-sprint1-api-mottion-2tdsb-$LOCATION --tags Sprint=$TASK
+
+az network nsg rule create -n ssh --nsg-name nsg-sprint1-api-mottion-2tdsb-$LOCATION --priority 1000 --direction Inbound --destination-address-prefixes VirtualNetwork --destination-port-ranges 22 -g rg-sprint1-api-mottion-2tdsb-$LOCATION --protocol Tcp
+
+az vm create -n vm-sprint1-api-mottion-2tdsb-$LOCATION -g rg-sprint1-api-mottion-2tdsb-$LOCATION --image $UBUNTU --size $VM_SIZE --vnet-name  vnet-sprint1-api-mottion-2tdsb-$LOCATION --subnet snet-sprint1-api-mottion-2tdsb-main --nsg nsg-sprint1-api-mottion-2tdsb-$LOCATION --authentication-type password --admin-username azureuser --admin-password Fiap2TDSB2025
+```
+
+### Abertura da Porta 8080 na Azure:
+```
+az vm open-port --resource-group rg-sprint1-api-mottion-2tdsb-brazilsouth --name vm-sprint1-api-mottion-2tdsb-brazilsouth --port 8080 --priority 1010
+```
+
+### Deletar o Resource Group: 
+```
+az group delete --name rg-sprint1-api-mottion-2tdsb-brazilsouth --yes --no-wait
+```
+
+### Instalação do Docker na VM:
+```
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+sudo usermod -aG docker $USER
+sudo su - azureuser
+```
