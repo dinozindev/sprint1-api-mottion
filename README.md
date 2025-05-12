@@ -1,3 +1,4 @@
+
 # Mottu Mottion - API
 
 ## Descrição do Projeto
@@ -56,7 +57,10 @@ dotnet restore
 dotnet ef database update
 ```
 
-
+### Se deseja utilizar a API localmente, em Program.cs mantenha a seguinte linha comentada:
+```code
+//builder.WebHost.UseUrls("http://0.0.0.0:5147");
+```
 
 ## Rotas da API
 
@@ -1058,8 +1062,8 @@ Códigos de Resposta
 ### Estrutura do Dockerfile para a matéria de DEVOPS TOOLS & CLOUD COMPUTING:
 
 ```
-# Etapa 1: build da aplicação
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+# Etapa 1: build da aplicação usando imagem Alpine
+FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
 WORKDIR /app
 
 # Copia os arquivos de projeto e restaura as dependências
@@ -1071,15 +1075,27 @@ COPY Sprint1-API/ ./Sprint1-API/
 WORKDIR /app/Sprint1-API
 RUN dotnet publish -c Release -o /app/out
 
-# Etapa 2: runtime
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
+# Etapa 2: runtime 
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
 WORKDIR /app
 
+# Cria um usuário sem privilégios
+RUN adduser -D -g '' appuser
+
 # Copia a aplicação compilada da etapa anterior
-COPY --from=build /app/out .
+COPY --from=build /app/out . 
+
+# Ajusta permissões para o usuário
+RUN chown -R appuser /app
+
+# Define o usuário não-root
+USER appuser
 
 # Porta da API
 EXPOSE 5147
+
+# Define o ambiente como "Development"
+ENV ASPNETCORE_ENVIRONMENT=Development
 
 # Comando para iniciar a aplicação
 ENTRYPOINT ["dotnet", "Sprint1-API.dll"]
@@ -1108,14 +1124,14 @@ az network nsg rule create -n ssh --nsg-name nsg-sprint1-api-mottion-2tdsb-$LOCA
 az vm create -n vm-sprint1-api-mottion-2tdsb-$LOCATION -g rg-sprint1-api-mottion-2tdsb-$LOCATION --image $UBUNTU --size $VM_SIZE --vnet-name  vnet-sprint1-api-mottion-2tdsb-$LOCATION --subnet snet-sprint1-api-mottion-2tdsb-main --nsg nsg-sprint1-api-mottion-2tdsb-$LOCATION --authentication-type password --admin-username azureuser --admin-password Fiap2TDSB2025
 ```
 
-### Abertura da Porta 8080 na Azure:
+### Abertura da Porta 5147 na Azure:
 ```
-az vm open-port --resource-group rg-sprint1-api-mottion-2tdsb-brazilsouth --name vm-sprint1-api-mottion-2tdsb-brazilsouth --port 8080 --priority 1010
+az vm open-port --resource-group rg-sprint1-api-mottion-2tdsb-brazilsouth --name vm-sprint1-api-mottion-2tdsb-brazilsouth --port 5147 --priority 1010
 ```
 
-### Deletar o Resource Group: 
+### Deletar o Resource Group, juntamente com a VM: 
 ```
-az group delete --name rg-sprint1-api-mottion-2tdsb-brazilsouth --yes --no-wait
+az group delete --name rg-sprint1-api-mottion-2tdsb-brazilsouth --yes
 ```
 
 ### Instalação do Docker na VM:
@@ -1138,4 +1154,9 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 
 sudo usermod -aG docker $USER
 sudo su - azureuser
+```
+
+### Criação do Container com base na imagem enviada para o Docker Hub:
+```
+docker run -d --name sprint1-container -p 5147:5147 dinozin/sprint1-api-mottion:latest
 ```
