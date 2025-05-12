@@ -1,1 +1,1 @@
-az group delete --name rg-sprint1-api-mottion-2tdsb-brazilsouth --yes --no-wait
+az group delete --name rg-sprint1-api-mottion-2tdsb-brazilsouth --yes 
