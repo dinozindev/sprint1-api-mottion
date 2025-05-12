@@ -1,4 +1,3 @@
-
 # Mottu Mottion - API
 
 ## Descrição do Projeto
@@ -213,6 +212,41 @@ Códigos de Resposta
 | 404 Not Found | Recurso não encontrado        | Quando a moto especificada não existe       |
 | 500 Internal Server Error | Erro interno     | Quando ocorre uma falha inesperada no servidor            |
 
+- #### Retorna uma moto pelo ID
+
+```http
+  GET /motos/por-chassi/{numero-chassi}
+```
+
+| Parâmetro   | Tipo       | Descrição                                   |
+| :---------- | :--------- | :------------------------------------------ |
+| `numero-chassi`      | `string` | **Obrigatório**. O número de chassi da moto que você deseja consultar |
+
+```json
+  {
+    "motoId": 1,
+    "placaMoto": "string",
+    "modeloMoto": "string",
+    "situacaoMoto": "string",
+    "chassiMoto": "string",
+    "cliente": {
+      "clienteId": 1,
+      "nomeCliente": "string",
+      "telefoneCliente": "string",
+      "sexoCliente": "string",
+      "emailCliente": "string",
+      "cpfCliente": "string"
+    }
+  }
+```
+Códigos de Resposta
+
+| Código HTTP | Significado                     | Quando ocorre                                             |
+|-------------|----------------------------------|-----------------------------------------------------------|
+| 200 OK      | Requisição bem-sucedida         | Quando a moto foi encontrada                            |
+| 404 Not Found | Recurso não encontrado        | Quando a moto especificada não existe       |
+| 500 Internal Server Error | Erro interno     | Quando ocorre uma falha inesperada no 
+
 
 - #### Retorna a última posição de uma moto pelo ID
 
@@ -304,7 +338,7 @@ Códigos de Resposta
 - #### Altera / Adiciona um cliente a moto
 
 ```http
-  PUT /motos/{id}/alterar-cliente?clienteId={clienteId}
+  PUT /motos/{id}/alterar-cliente/{clienteId}
 ```
 
 | Parâmetro   | Tipo       | Descrição                                   |
