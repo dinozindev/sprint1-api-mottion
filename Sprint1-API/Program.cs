@@ -209,6 +209,43 @@ motos.MapGet("/{id}", async ([Description("Identificador único da Moto")] int i
     .Produces(StatusCodes.Status404NotFound)
     .Produces(StatusCodes.Status500InternalServerError);
 
+// retorna uma moto através do número de chassi
+motos.MapGet("/por-chassi/{numeroChassi}", async ([Description("Número de Chassi único da Moto")] string numeroChassi, AppDbContext db) =>
+    {
+        var moto = await db.Motos
+            .Include(m => m.Cliente)
+            .FirstOrDefaultAsync(m => m.ChassiMoto == numeroChassi);
+
+        if (moto == null)
+            return Results.NotFound("Moto não encontrada com o número de chassi fornecido.");
+
+        var motoDto = new MotoReadDto(
+            moto.MotoId,
+            moto.PlacaMoto,
+            moto.ModeloMoto,
+            moto.SituacaoMoto,
+            moto.ChassiMoto,
+            moto.Cliente == null 
+                ? null 
+                : new ClienteResumoDto(
+                    moto.Cliente.ClienteId,
+                    moto.Cliente.NomeCliente,
+                    moto.Cliente.TelefoneCliente,
+                    moto.Cliente.SexoCliente,
+                    moto.Cliente.EmailCliente,
+                    moto.Cliente.CpfCliente
+                )
+        );
+
+        return Results.Ok(motoDto);
+    })
+    .WithSummary("Retorna uma moto pelo Número de Chassi")
+    .WithDescription("Retorna uma moto pelo número de Chassi. Retorna 200 OK se a moto for encontrada, ou erro se não for achada.")
+    .Produces<MotoReadDto>(StatusCodes.Status200OK)
+    .Produces(StatusCodes.Status404NotFound)
+    .Produces(StatusCodes.Status500InternalServerError);
+
+
 // busca a última posição que a moto esteve.
 motos.MapGet("/{id}/ultima-posicao", async (int id, AppDbContext db) =>
     {
@@ -346,7 +383,7 @@ motos.MapPut("/{id}/remover-cliente", async (int id, AppDbContext db) =>
     .ProducesProblem(StatusCodes.Status500InternalServerError);
 
 // altera a associação de uma moto com um cliente
-motos.MapPut("/{id}/alterar-cliente", async (int id, int clienteId, AppDbContext db) =>
+motos.MapPut("/{id}/alterar-cliente/{clienteId}", async (int id, int clienteId, AppDbContext db) =>
 {
     var moto = await db.Motos.FindAsync(id);
     if (moto is null) return Results.NotFound("Nenhuma moto encontrada com o ID informado.");
