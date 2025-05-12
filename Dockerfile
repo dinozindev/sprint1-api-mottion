@@ -23,3 +23,6 @@ EXPOSE 5147
 
 # Comando para iniciar a aplicação
 ENTRYPOINT ["dotnet", "Sprint1-API.dll"]
+
+# Defina o ambiente como "Development"
+ENV ASPNETCORE_ENVIRONMENT=Development

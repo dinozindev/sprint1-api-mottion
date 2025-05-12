@@ -45,10 +45,15 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSignalR();
 
-// usado para poder acessar a API tanto localmente quanto pela Azure
-builder.WebHost.UseUrls("http://localhost:5147","http://0.0.0.0:5147");
+// usado para poder acessar a API na Azure (Tire o comentário somente se for utilizar na Azure, caso contrário, utilize o localhost padrão)
+//builder.WebHost.UseUrls("http://0.0.0.0:5147");
 
 var app = builder.Build();
+
+//  habilita o CORS
+app.UseCors();
+// limita a qtnd de requisições
+app.UseRateLimiter();
 
 app.MapHub<SetorHub>("/hub/setores");
 
@@ -68,11 +73,6 @@ var funcionarios = app.MapGroup("/funcionarios").WithTags("Funcionarios");
 var gerentes = app.MapGroup("/gerentes").WithTags("Gerentes");
 var setores = app.MapGroup("/setores").WithTags("Setores");
 
-// limita a qtnd de requisições
-app.UseRateLimiter();
-
-//  habilita o CORS
-app.UseCors();
 
 // busca todos os clientes
 clientes.MapGet("/", async (AppDbContext db) =>
