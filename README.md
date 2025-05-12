@@ -1,6 +1,10 @@
 
 # Mottu Mottion - API
 
+- Giovanna Revito Roz - RM558981 
+- Kaian Gustavo de Oliveira Nascimento - RM558986 
+- Lucas Kenji Kikuchi - RM554424 
+
 ## Descrição do Projeto
 
 A Mottion nasce como resposta a um dos maiores gargalos operacionais
