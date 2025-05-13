@@ -1,9 +1,4 @@
-
 # Mottu Mottion - API
-
-- Giovanna Revito Roz - RM558981 
-- Kaian Gustavo de Oliveira Nascimento - RM558986 
-- Lucas Kenji Kikuchi - RM554424 
 
 ## Descrição do Projeto
 
@@ -1105,6 +1100,17 @@ ENV ASPNETCORE_ENVIRONMENT=Development
 ENTRYPOINT ["dotnet", "Sprint1-API.dll"]
 ```
 
+### Observação: A API funciona normalmente na nuvem sem essa modificação usando, por exemplo, o Postman, mas para que o Scalar funcione na Azure, é necessário alterar em Program.cs a seguinte linha de código (antes de construir a imagem): 
+```
+builder.WebHost.UseUrls("http://<ip-publico-da-maquina-virtual>:5147");
+```
+
+### E depois construir a imagem e fazer o push em seu Docker Hub
+```
+ docker build -t <nome-usuario>/sprint1-api-mottion:latest .
+ docker push <nome-usuario>/sprint1-api-mottion:latest
+```
+
 ## Scripts do Azure CLI
 
 ### Criação da VM:
@@ -1159,6 +1165,12 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 sudo usermod -aG docker $USER
 sudo su - azureuser
 ```
+
+### Criação do Container com base na imagem enviada para o Docker Hub:
+```
+docker run -d --name sprint1-container -p 5147:5147 dinozin/sprint1-api-mottion:latest
+```
+
 
 ### Criação do Container com base na imagem enviada para o Docker Hub:
 ```
