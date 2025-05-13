@@ -1172,7 +1172,7 @@ docker run -d --name sprint1-container -p 5147:5147 dinozin/sprint1-api-mottion:
 ```
 
 
-### Criação do Container com base na imagem enviada para o Docker Hub:
+### Alternativa: Criação do Container com base na imagem enviada para o seu Docker Hub:
 ```
-docker run -d --name sprint1-container -p 5147:5147 dinozin/sprint1-api-mottion:latest
+docker run -d --name sprint1-container -p 5147:5147 <nome-usuario>/sprint1-api-mottion:latest
 ```
