@@ -303,8 +303,7 @@ Request Body:
   "placaMoto": null,
   "modeloMoto": "",
   "situacaoMoto": "",
-  "chassiMoto": "",
-  "clienteId": null
+  "chassiMoto": ""
 }
 ```
 
@@ -316,6 +315,38 @@ Códigos de Resposta
 | 400 Bad Request   | Requisição malformada           | Quando os dados enviados estão incorretos ou incompletos       |
 | 409 Conflict      | Conflito de estado              | Quando há conflito, como dados duplicados (placa e chassi)                     |
 | 500 Internal Server Error | Erro interno             | Quando ocorre uma falha inesperada no servidor                 |
+
+- #### Atualiza uma moto
+
+```http
+  PUT /motos/{id}
+```
+
+Request Body:
+
+```json
+{
+  "placaMoto": null,
+  "modeloMoto": "",
+  "situacaoMoto": "",
+  "chassiMoto": ""
+}
+```
+
+| Parâmetro   | Tipo       | Descrição                                   |
+| :---------- | :--------- | :------------------------------------------ |
+| `id`      | `int` | **Obrigatório**. O ID da moto que você atualizar |
+
+Códigos de Resposta
+
+| Código HTTP       | Significado                     | Quando ocorre                                                  |
+|-------------------|----------------------------------|----------------------------------------------------------------|
+| 201 Created       | Recurso criado com sucesso      | Quando uma moto é criada com êxito |
+| 400 Bad Request   | Requisição malformada           | Quando os dados enviados estão incorretos ou incompletos       |
+| 404 Not Found | Recurso não encontrado        |  Quando nenhuma moto foi encontrada com o ID especificado      |
+| 409 Conflict      | Conflito de estado              | Quando há conflito, como dados duplicados (placa e chassi)                     |
+| 500 Internal Server Error | Erro interno             | Quando ocorre uma falha inesperada no servidor                 |
+
 
 
 - #### Remove um cliente da moto
@@ -1169,10 +1200,4 @@ sudo su - azureuser
 ### Criação do Container com base na imagem enviada para o Docker Hub:
 ```
 docker run -d --name sprint1-container -p 5147:5147 dinozin/sprint1-api-mottion:latest
-```
-
-
-### Alternativa: Criação do Container com base na imagem enviada para o seu Docker Hub:
-```
-docker run -d --name sprint1-container -p 5147:5147 <nome-usuario>/sprint1-api-mottion:latest
 ```
