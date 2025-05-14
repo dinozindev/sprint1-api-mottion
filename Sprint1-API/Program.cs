@@ -45,7 +45,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSignalR();
 
-// usado para poder acessar a API na Azure (Tire o comentário somente se for utilizar na Azure, caso contrário, utilize o localhost padrão)
+// usado para poder acessar a API na Azure (Tire o comentário somente se for utilizar na Azure)
 //builder.WebHost.UseUrls("http://0.0.0.0:5147");
 
 var app = builder.Build();
@@ -72,6 +72,7 @@ var movimentacoes = app.MapGroup("/movimentacoes").WithTags("Movimentacoes");
 var funcionarios = app.MapGroup("/funcionarios").WithTags("Funcionarios");
 var gerentes = app.MapGroup("/gerentes").WithTags("Gerentes");
 var setores = app.MapGroup("/setores").WithTags("Setores");
+
 
 
 // busca todos os clientes
@@ -293,7 +294,7 @@ motos.MapPost("/", async (MotoPostDto dto, AppDbContext db) =>
             ModeloMoto = dto.ModeloMoto,
             SituacaoMoto = dto.SituacaoMoto,
             ChassiMoto = dto.ChassiMoto,
-            ClienteId = dto.ClienteId
+            ClienteId = null
         };
         
         // verifica se a placa está no formato correto
@@ -338,13 +339,73 @@ motos.MapPost("/", async (MotoPostDto dto, AppDbContext db) =>
         return Results.Created($"/motos/{moto.MotoId}", moto);
     
 })
-    .Accepts<Moto>("application/json")
+    .Accepts<MotoPostDto>("application/json")
     .WithSummary("Cria uma moto")
     .WithDescription("Cria uma moto no sistema.")
     .Produces<Moto>(StatusCodes.Status201Created)
     .Produces(StatusCodes.Status400BadRequest)
     .Produces(StatusCodes.Status409Conflict)
     .Produces(StatusCodes.Status500InternalServerError);
+
+// atualiza os dados da moto (menos o cliente)
+motos.MapPut("/{id}", async (int id, MotoPostDto dto, AppDbContext db) =>
+{
+    var motoExistente = await db.Motos.FindAsync(id);
+    if (motoExistente is null)
+        return Results.NotFound($"Moto com ID {id} não encontrada.");
+    
+    motoExistente.PlacaMoto = dto.PlacaMoto;
+    motoExistente.ModeloMoto = dto.ModeloMoto;
+    motoExistente.SituacaoMoto = dto.SituacaoMoto;
+    motoExistente.ChassiMoto = dto.ChassiMoto;
+    
+    if (!string.IsNullOrWhiteSpace(motoExistente.PlacaMoto))
+    {
+        if (!System.Text.RegularExpressions.Regex.IsMatch(motoExistente.PlacaMoto, @"^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$"))
+        {
+            return Results.BadRequest("Placa inválida. Use o formato ABC1234 ou ABC1D23.");
+        }
+
+        var placaExistente = await db.Motos
+            .CountAsync(m => m.PlacaMoto == motoExistente.PlacaMoto && m.MotoId != id);
+
+        if (placaExistente > 0)
+            return Results.Conflict($"Já existe uma moto com a placa '{motoExistente.PlacaMoto}'.");
+    }
+    
+    if (string.IsNullOrWhiteSpace(motoExistente.ChassiMoto) ||
+        !System.Text.RegularExpressions.Regex.IsMatch(motoExistente.ChassiMoto, @"^[A-HJ-NPR-Z0-9]{17}$"))
+    {
+        return Results.BadRequest("Chassi inválido. Deve conter 17 caracteres alfanuméricos, sem I, O ou Q.");
+    }
+
+    var chassiExistente = await db.Motos
+        .CountAsync(m => m.ChassiMoto == motoExistente.ChassiMoto && m.MotoId != id);
+
+    if (chassiExistente > 0)
+        return Results.Conflict($"Já existe uma moto com o chassi '{motoExistente.ChassiMoto}'.");
+    
+    var modelosValidos = new[] { "Mottu Pop", "Mottu Sport", "Mottu-E" };
+    if (!modelosValidos.Contains(motoExistente.ModeloMoto))
+        return Results.BadRequest("Modelo inválido. Os modelos válidos são: Mottu Pop, Mottu Sport, Mottu-E.");
+    
+    var situacoesValidas = new[] { "Ativa", "Inativa", "Manutenção", "Em Trânsito" };
+    if (!situacoesValidas.Contains(motoExistente.SituacaoMoto))
+        return Results.BadRequest("Situação inválida. As situações válidas são: Ativa, Inativa, Manutenção, Em Trânsito.");
+    
+    await db.SaveChangesAsync();
+    return Results.Ok(motoExistente);
+
+})
+.Accepts<MotoPostDto>("application/json")
+.WithSummary("Atualiza uma moto")
+.WithDescription("Atualiza os dados de uma moto existente.")
+.Produces<Moto>(StatusCodes.Status200OK)
+.Produces(StatusCodes.Status400BadRequest)
+.Produces(StatusCodes.Status404NotFound)
+.Produces(StatusCodes.Status409Conflict)
+.Produces(StatusCodes.Status500InternalServerError);
+
 
 // deleta uma moto pelo ID
 motos.MapDelete("/{id}", async (int id, AppDbContext db) =>
