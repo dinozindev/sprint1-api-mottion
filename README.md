@@ -1136,7 +1136,7 @@ ENTRYPOINT ["dotnet", "Sprint1-API.dll"]
 builder.WebHost.UseUrls("http://<ip-publico-da-maquina-virtual>:5147");
 ```
 
-### E depois construir a imagem e fazer o push em seu Docker Hub
+### E depois construir a imagem e fazer o push em seu Docker Hub:
 ```
  docker build -t <nome-usuario>/sprint1-api-mottion:latest .
  docker push <nome-usuario>/sprint1-api-mottion:latest
