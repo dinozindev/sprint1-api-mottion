@@ -1,4 +1,4 @@
-﻿namespace Sprint1_API.Dto;
+﻿namespace Sprint1_API.Dtos;
 
 public record ClienteReadDto(
 int ClienteId,

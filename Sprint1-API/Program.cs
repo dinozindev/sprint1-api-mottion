@@ -3,10 +3,9 @@ using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using Scalar.AspNetCore;
 using Sprint1_API;
-using Sprint1_API.Dto;
+using Sprint1_API.Dtos;
 using Sprint1_API.Model;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,7 +44,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSignalR();
 
-// usado para poder acessar a API na Azure (Tire o comentário somente se for utilizar na Azure)
+// usado para poder acessar a API na Azure (Tire o comentário somente se for utilizar na Azure criando a imagem)
 //builder.WebHost.UseUrls("http://0.0.0.0:5147");
 
 var app = builder.Build();
