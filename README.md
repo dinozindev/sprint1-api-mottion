@@ -1131,12 +1131,12 @@ ENV ASPNETCORE_ENVIRONMENT=Development
 ENTRYPOINT ["dotnet", "Sprint1-API.dll"]
 ```
 
-### Observação: A API funciona normalmente na nuvem sem essa modificação usando, por exemplo, o Postman, mas para que o Scalar funcione na Azure, é necessário alterar em Program.cs a seguinte linha de código (antes de construir a imagem): 
+### Observação: A API funciona normalmente na nuvem, mas para que o Scalar funcione na Azure (Sem criar um novo servidor pelo Client API), é necessário alterar em Program.cs a seguinte linha de código (antes de construir a imagem): 
 ```
 builder.WebHost.UseUrls("http://<ip-publico-da-maquina-virtual>:5147");
 ```
 
-### E depois construir a imagem e fazer o push em seu Docker Hub
+### E depois construir a imagem e fazer o push em seu Docker Hub:
 ```
  docker build -t <nome-usuario>/sprint1-api-mottion:latest .
  docker push <nome-usuario>/sprint1-api-mottion:latest
