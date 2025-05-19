@@ -1201,3 +1201,20 @@ sudo su - azureuser
 ```
 docker run -d --name sprint1-container -p 5147:5147 dinozin/sprint1-api-mottion:latest
 ```
+
+### Acessar o Scalar:
+```
+http://<ip-publico-da-vm>:5147/scalar
+```
+
+## Guia para testar Endpoints no Scalar pela VM da Azure
+
+![App Screenshot](https://imgur.com/rdplLuU)
+
+![App Screenshot](https://imgur.com/Y3KDSYM)
+
+![App Screenshot](https://imgur.com/YYXIYKV)
+
+![App Screenshot](https://imgur.com/QgJAJGn)
+
+![App Screenshot](https://imgur.com/SdVsc81)
