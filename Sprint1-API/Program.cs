@@ -247,7 +247,7 @@ motos.MapGet("/por-chassi/{numeroChassi}", async ([Description("Número de Chass
 
 
 // busca a última posição que a moto esteve.
-motos.MapGet("/{id}/ultima-posicao", async (int id, AppDbContext db) =>
+motos.MapGet("/{id}/ultima-posicao", async ([Description("ID único da Moto")] int id, AppDbContext db) =>
     {
         var ultimaMovimentacao = await db.Movimentacoes
             .Where(m => m.MotoId == id)
@@ -347,7 +347,7 @@ motos.MapPost("/", async (MotoPostDto dto, AppDbContext db) =>
     .Produces(StatusCodes.Status500InternalServerError);
 
 // atualiza os dados da moto (menos o cliente)
-motos.MapPut("/{id}", async (int id, MotoPostDto dto, AppDbContext db) =>
+motos.MapPut("/{id}", async ([Description("ID único da Moto")] int id, MotoPostDto dto, AppDbContext db) =>
 {
     var motoExistente = await db.Motos.FindAsync(id);
     if (motoExistente is null)
@@ -407,7 +407,7 @@ motos.MapPut("/{id}", async (int id, MotoPostDto dto, AppDbContext db) =>
 
 
 // deleta uma moto pelo ID
-motos.MapDelete("/{id}", async (int id, AppDbContext db) =>
+motos.MapDelete("/{id}", async ([Description("ID único da Moto")] int id, AppDbContext db) =>
 {
     if (await db.Motos.FindAsync(id) is { } existingMoto)
     {
@@ -425,7 +425,7 @@ motos.MapDelete("/{id}", async (int id, AppDbContext db) =>
     .Produces(StatusCodes.Status500InternalServerError);
 
 // remove a associação de uma moto com um cliente
-motos.MapPut("/{id}/remover-cliente", async (int id, AppDbContext db) =>
+motos.MapPut("/{id}/remover-cliente", async ([Description("ID único da Moto")] int id, AppDbContext db) =>
 {
     var moto = await db.Motos.FindAsync(id);
     if (moto is null) return Results.NotFound("Nenhuma moto encontrada com o ID informado.");
@@ -443,7 +443,7 @@ motos.MapPut("/{id}/remover-cliente", async (int id, AppDbContext db) =>
     .ProducesProblem(StatusCodes.Status500InternalServerError);
 
 // altera a associação de uma moto com um cliente
-motos.MapPut("/{id}/alterar-cliente/{clienteId}", async (int id, int clienteId, AppDbContext db) =>
+motos.MapPut("/{id}/alterar-cliente/{clienteId}", async ([Description("ID único da Moto")] int id, [Description("ID único do Cliente")] int clienteId, AppDbContext db) =>
 {
     var moto = await db.Motos.FindAsync(id);
     if (moto is null) return Results.NotFound("Nenhuma moto encontrada com o ID informado.");
@@ -882,7 +882,7 @@ movimentacoes.MapGet("/", async (AppDbContext db) =>
     .Produces(StatusCodes.Status500InternalServerError);
 
 // Retorna todas as movimentações de uma moto específica pelo ID
-movimentacoes.MapGet("/por-moto/{motoId}", async (int motoId, AppDbContext db) =>
+movimentacoes.MapGet("/por-moto/{motoId}", async ([Description("ID único da Moto")] int motoId, AppDbContext db) =>
 {
     // Verifica se a moto existe
     var moto = await db.Motos
@@ -1002,7 +1002,7 @@ movimentacoes.MapGet("/{id}", async ([Description("Identificador único de movim
 
 
 // Retorna a quantidade de vagas ocupadas e o total de vagas por Setor de um Patio
-movimentacoes.MapGet("/ocupacao-por-setor/patio/{id}", async (int id, AppDbContext db) =>
+movimentacoes.MapGet("/ocupacao-por-setor/patio/{id}", async ([Description("ID único do Pátio")] int id, AppDbContext db) =>
 {
     var resultado = await db.Setores
         .Where(s => s.PatioId == id)
@@ -1161,8 +1161,8 @@ movimentacoes.MapPost("/", async (MovimentacaoPostDto dto, AppDbContext db, IHub
 .Produces(StatusCodes.Status500InternalServerError);
 
 
-
-movimentacoes.MapPut("/{id}/saida", async (int id, AppDbContext db, IHubContext<SetorHub> hub) =>
+// atualiza a data de saída de uma movimentação
+movimentacoes.MapPut("/{id}/saida", async ([Description("ID único da Movimentação")] int id, AppDbContext db, IHubContext<SetorHub> hub) =>
 {
     var movimentacao = await db.Movimentacoes
         .Include(m => m.Moto)
