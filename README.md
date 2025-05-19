@@ -1209,12 +1209,12 @@ http://<ip-publico-da-vm>:5147/scalar
 
 ## Guia para testar Endpoints no Scalar pela VM da Azure
 
-![App Screenshot](https://imgur.com/rdplLuU)
+![App Screenshot](https://imgur.com/rdplLuU.png)
 
-![App Screenshot](https://imgur.com/Y3KDSYM)
+![App Screenshot](https://imgur.com/Y3KDSYM.png)
 
-![App Screenshot](https://imgur.com/YYXIYKV)
+![App Screenshot](https://imgur.com/YYXIYKV.png)
 
-![App Screenshot](https://imgur.com/QgJAJGn)
+![App Screenshot](https://imgur.com/QgJAJGn.png)
 
-![App Screenshot](https://imgur.com/SdVsc81)
+![App Screenshot](https://imgur.com/SdVsc81.png)
