@@ -1147,11 +1147,11 @@ ENTRYPOINT ["dotnet", "Sprint1-API.dll"]
 builder.WebHost.UseUrls("http://<ip-publico-da-maquina-virtual>:5147");
 ```
 
-### Ou caso queira construir a imagem antes da criação da VM, basta retirar o comentário da linha (será necessário criar um novo servidor pelo Client API): 
+### Ou caso queira construir a imagem antes da criação da VM, basta retirar o comentário da linha (será necessário criar um novo servidor pelo Client API):
+#### Este método foi utilizado na construção na imagem enviada ao Docker Hub (dinozin/sprint1-api-mottion:latest).
 ```code
 //builder.WebHost.UseUrls("http://0.0.0.0:5147");
 ```
-
 
 ### E depois construir a imagem e fazer o push em seu Docker Hub:
 ```
@@ -1187,11 +1187,6 @@ az vm create -n vm-sprint1-api-mottion-2tdsb-$LOCATION -g rg-sprint1-api-mottion
 az vm open-port --resource-group rg-sprint1-api-mottion-2tdsb-brazilsouth --name vm-sprint1-api-mottion-2tdsb-brazilsouth --port 5147 --priority 1010
 ```
 
-### Deletar o Resource Group, juntamente com a VM: 
-```
-az group delete --name rg-sprint1-api-mottion-2tdsb-brazilsouth --yes
-```
-
 ### Instalação do Docker na VM:
 ```
 # Add Docker's official GPG key:
@@ -1222,6 +1217,11 @@ docker run -d --name sprint1-container -p 5147:5147 dinozin/sprint1-api-mottion:
 ### Acessar o Scalar:
 ```
 http://<ip-publico-da-vm>:5147/scalar
+```
+
+### Deletar o Resource Group, juntamente com a VM: 
+```
+az group delete --name rg-sprint1-api-mottion-2tdsb-brazilsouth --yes
 ```
 
 ## Guia para testar Endpoints no Scalar pela Azure criando servidor com o IP público da VM:
