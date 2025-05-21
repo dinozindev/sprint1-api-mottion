@@ -1148,7 +1148,7 @@ builder.WebHost.UseUrls("http://<ip-publico-da-maquina-virtual>:5147");
 ```
 
 ### Ou caso queira construir a imagem antes da criação da VM, basta retirar o comentário da linha (será necessário criar um novo servidor pelo Client API):
-#### Este método foi utilizado na construção na imagem enviada ao Docker Hub (dinozin/sprint1-api-mottion:latest).
+#### Este passo foi utilizado na construção da imagem enviada ao Docker Hub (dinozin/sprint1-api-mottion:latest).
 ```code
 //builder.WebHost.UseUrls("http://0.0.0.0:5147");
 ```
