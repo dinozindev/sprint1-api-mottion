@@ -37,6 +37,7 @@ Antes de instalar, verifique se os seguintes itens estão instalados:
 ```bash
 git clone https://github.com/dinozindev/sprint1-api-mottion.git
 cd sprint1-api-mottion
+cd Sprint1-API
 ```
 
 ### Instale as dependências:
