@@ -57,6 +57,16 @@ dotnet restore
 dotnet ef database update
 ```
 
+### Inicie a aplicação: 
+```bash
+dotnet run
+```
+
+### Para acessar a documentação da aplicação: 
+```bash
+http://localhost:5147/scalar
+```
+
 ### Se deseja utilizar a API localmente, em Program.cs mantenha a seguinte linha comentada:
 ```code
 //builder.WebHost.UseUrls("http://0.0.0.0:5147");
