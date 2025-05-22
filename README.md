@@ -1187,6 +1187,12 @@ az vm create -n vm-sprint1-api-mottion-2tdsb-$LOCATION -g rg-sprint1-api-mottion
 az vm open-port --resource-group rg-sprint1-api-mottion-2tdsb-brazilsouth --name vm-sprint1-api-mottion-2tdsb-brazilsouth --port 5147 --priority 1010
 ```
 
+### Login na VM:
+```
+ssh azureuser@<ip-publico-vm>
+Senha: Fiap2TDSB2025
+```
+
 ### Instalação do Docker na VM:
 ```
 # Add Docker's official GPG key:
