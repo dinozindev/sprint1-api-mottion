@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Sprint1-API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1880954e7b5e359a1f2fc6f581de34cef589dc21")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f069ccc78c5eebb795ad735495234dc8e2c2f3d5")]
 [assembly: System.Reflection.AssemblyProductAttribute("Sprint1-API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Sprint1-API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

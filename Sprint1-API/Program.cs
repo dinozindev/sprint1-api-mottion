@@ -77,24 +77,13 @@ var setores = app.MapGroup("/setores").WithTags("Setores");
 // busca todos os clientes
 clientes.MapGet("/", async (AppDbContext db) =>
     {
-        var clientesDto = await db.Clientes
+        var clientesObtidos = await db.Clientes
             .Include(c => c.Motos)
-            .Select(c => new ClienteReadDto(
-                c.ClienteId,
-                c.NomeCliente,
-                c.TelefoneCliente,
-                c.SexoCliente,
-                c.EmailCliente,
-                c.CpfCliente,
-                c.Motos.Select(m => new MotoResumoDto(
-                    m.MotoId,
-                    m.PlacaMoto,
-                    m.ModeloMoto,
-                    m.SituacaoMoto,
-                    m.ChassiMoto
-                )).ToList()
-            ))
             .ToListAsync();
+        
+        var clientesDto = clientesObtidos
+            .Select(ClienteReadDto.ToDto)
+            .ToList();
 
         return clientesDto.Count == 0 ? Results.NoContent() : Results.Ok(clientesDto);
     })
@@ -115,21 +104,7 @@ clientes.MapGet("/{id}", async ([Description("Identificador único do Cliente")]
         if (cliente == null)
             return Results.NotFound("Cliente não encontrado com o ID fornecido.");
 
-        var clienteDto = new ClienteReadDto(
-            cliente.ClienteId,
-            cliente.NomeCliente,
-            cliente.TelefoneCliente,
-            cliente.SexoCliente,
-            cliente.EmailCliente,
-            cliente.CpfCliente,
-            cliente.Motos.Select(m => new MotoResumoDto(
-                m.MotoId,
-                m.PlacaMoto,
-                m.ModeloMoto,
-                m.SituacaoMoto,
-                m.ChassiMoto
-            )).ToList()
-        );
+        var clienteDto = ClienteReadDto.ToDto(cliente);
 
         return Results.Ok(clienteDto);
     })
@@ -142,27 +117,13 @@ clientes.MapGet("/{id}", async ([Description("Identificador único do Cliente")]
 // retorna todas as motos cadastradas no sistema.
 motos.MapGet("/", async (AppDbContext db) =>
     {
-        var motos = await db.Motos
+        var motosObtidas = await db.Motos
             .Include(m => m.Cliente)
             .ToListAsync();
 
-        var motosDto = motos.Select(m => new MotoReadDto(
-            m.MotoId,
-            m.PlacaMoto,
-            m.ModeloMoto,
-            m.SituacaoMoto,
-            m.ChassiMoto,
-            m.Cliente == null 
-                ? null 
-                : new ClienteResumoDto(
-                    m.Cliente.ClienteId,
-                    m.Cliente.NomeCliente,
-                    m.Cliente.TelefoneCliente,
-                    m.Cliente.SexoCliente,
-                    m.Cliente.EmailCliente,
-                    m.Cliente.CpfCliente
-                )
-        )).ToList();
+        var motosDto = motosObtidas
+            .Select(MotoReadDto.ToDto)
+            .ToList();
 
         return motosDto.Count == 0 ? Results.NoContent() : Results.Ok(motosDto);
     })
@@ -183,23 +144,7 @@ motos.MapGet("/{id}", async ([Description("Identificador único da Moto")] int i
         if (moto == null)
             return Results.NotFound("Moto não encontrada com o ID fornecido.");
 
-        var motoDto = new MotoReadDto(
-            moto.MotoId,
-            moto.PlacaMoto,
-            moto.ModeloMoto,
-            moto.SituacaoMoto,
-            moto.ChassiMoto,
-            moto.Cliente == null 
-                ? null 
-                : new ClienteResumoDto(
-                    moto.Cliente.ClienteId,
-                    moto.Cliente.NomeCliente,
-                    moto.Cliente.TelefoneCliente,
-                    moto.Cliente.SexoCliente,
-                    moto.Cliente.EmailCliente,
-                    moto.Cliente.CpfCliente
-                )
-        );
+        var motoDto = MotoReadDto.ToDto(moto);
 
         return Results.Ok(motoDto);
     })
@@ -219,23 +164,7 @@ motos.MapGet("/por-chassi/{numeroChassi}", async ([Description("Número de Chass
         if (moto == null)
             return Results.NotFound("Moto não encontrada com o número de chassi fornecido.");
 
-        var motoDto = new MotoReadDto(
-            moto.MotoId,
-            moto.PlacaMoto,
-            moto.ModeloMoto,
-            moto.SituacaoMoto,
-            moto.ChassiMoto,
-            moto.Cliente == null 
-                ? null 
-                : new ClienteResumoDto(
-                    moto.Cliente.ClienteId,
-                    moto.Cliente.NomeCliente,
-                    moto.Cliente.TelefoneCliente,
-                    moto.Cliente.SexoCliente,
-                    moto.Cliente.EmailCliente,
-                    moto.Cliente.CpfCliente
-                )
-        );
+        var motoDto = MotoReadDto.ToDto(moto);
 
         return Results.Ok(motoDto);
     })
@@ -466,25 +395,14 @@ motos.MapPut("/{id}/alterar-cliente/{clienteId}", async ([Description("ID único
 //  Retorna todos os Patios cadastrados
 patios.MapGet("/", async (AppDbContext db) =>
     {
-        var patiosDto = await db.Patios
+        var patiosObtidos = await db.Patios
             .Include(p => p.Setores)
             .ThenInclude(s => s.Vagas)
-            .Select(p => new PatioReadDto(
-                p.PatioId,
-                p.LocalizacaoPatio,
-                p.NomePatio,
-                p.DescricaoPatio,
-                p.Setores.Select(s => new SetorResumoPatioDto(
-                    s.SetorId,
-                    s.TipoSetor,
-                    s.StatusSetor,
-                    s.Vagas.Select(v => new VagaResumoDto(
-                        v.VagaId,
-                        v.NumeroVaga,
-                        v.StatusOcupada
-                    )).ToList()
-                )).ToList()
-            )).ToListAsync();
+            .ToListAsync();
+        
+        var patiosDto = patiosObtidos
+            .Select(PatioReadDto.ToDto)
+            .ToList();
 
         return patiosDto.Count == 0 ? Results.NoContent() : Results.Ok(patiosDto);
     })
@@ -508,22 +426,7 @@ patios.MapGet("/{id}", async ([Description("Identificador único do patio")] int
         return Results.NotFound();
     }
     
-    var patioDto = new PatioReadDto(
-        patio.PatioId,
-        patio.LocalizacaoPatio,
-        patio.NomePatio,
-        patio.DescricaoPatio,
-        patio.Setores.Select(s => new SetorResumoPatioDto(
-            s.SetorId,
-            s.TipoSetor,
-            s.StatusSetor,
-            s.Vagas.Select(v => new VagaResumoDto(
-                v.VagaId,
-                v.NumeroVaga,
-                v.StatusOcupada
-            )).ToList()
-        )).ToList()
-    );
+    var patioDto = PatioReadDto.ToDto(patio);
         
         return Results.Ok(patioDto);
     })
@@ -537,12 +440,12 @@ patios.MapGet("/{id}", async ([Description("Identificador único do patio")] int
 // Retorna uma lista de todos os cargos
 cargos.MapGet("/", async (AppDbContext db) =>
     {
-        var cargosDto = await db.Cargos
-            .Select(c => new CargoReadDto(
-                c.CargoId,
-                c.NomeCargo,
-                c.DescricaoCargo
-            )).ToListAsync();
+        var cargosObtidos = await db.Cargos
+            .ToListAsync();
+        
+        var cargosDto = cargosObtidos
+            .Select(CargoReadDto.ToDto)
+            .ToList();
         
         return cargosDto.Count == 0 ? Results.NoContent() : Results.Ok(cargosDto);
     })
@@ -562,17 +465,13 @@ cargos.MapGet("/{id}", async ([Description("Identificador único do cargo")] int
         return Results.NotFound("Nenhum cargo encontrado com o ID fornecido.");
     }
 
-    var cargoDto = new CargoReadDto(
-        cargo.CargoId,
-        cargo.NomeCargo,
-        cargo.DescricaoCargo
-    );
+    var cargoDto = CargoReadDto.ToDto(cargo);
     
-    return Results.Ok(cargo);
+    return Results.Ok(cargoDto);
 })
     .WithSummary("Retorna um cargo pelo ID")
     .WithDescription("Retorna um cargo a partir de um ID. Retorna 200 OK se o cargo for encontrado, ou erro se não for achado.")
-    .Produces<Cargo>(StatusCodes.Status200OK)
+    .Produces<CargoReadDto>(StatusCodes.Status200OK)
     .Produces(StatusCodes.Status404NotFound)
     .Produces(StatusCodes.Status500InternalServerError);
 
@@ -580,26 +479,14 @@ cargos.MapGet("/{id}", async ([Description("Identificador único do cargo")] int
 // Retorna uma lista de todos os funcionários
 funcionarios.MapGet("/", async (AppDbContext db) =>
     {
-        var funcionariosDto = await db.Funcionarios
+        var funcionariosObtidos = await db.Funcionarios
             .Include(f => f.Cargo)
             .Include(f => f.Patio)
-            .Select(f => new FuncionarioReadDto(
-                f.FuncionarioId,
-                f.NomeFuncionario,
-                f.TelefoneFuncionario,
-                new CargoReadDto(
-                    f.Cargo.CargoId,
-                    f.Cargo.NomeCargo,
-                    f.Cargo.DescricaoCargo
-                ),
-                new PatioResumoDto(
-                    f.Patio.PatioId,
-                    f.Patio.LocalizacaoPatio,
-                    f.Patio.NomePatio,
-                    f.Patio.DescricaoPatio
-                )
-            ))
             .ToListAsync();
+        
+        var funcionariosDto = funcionariosObtidos
+            .Select(FuncionarioReadDto.ToDto)
+            .ToList();
 
         return funcionariosDto.Count == 0 ? Results.NoContent() : Results.Ok(funcionariosDto);
     })
@@ -621,22 +508,7 @@ funcionarios.MapGet("/{id}", async ([Description("Identificador único do funcio
         if (funcionario == null)
             return Results.NotFound("Nenhum funcionário encontrado com ID fornecido.");
 
-        var funcionarioDto = new FuncionarioReadDto(
-            funcionario.FuncionarioId,
-            funcionario.NomeFuncionario,
-            funcionario.TelefoneFuncionario,
-            new CargoReadDto(
-                funcionario.Cargo.CargoId,
-                funcionario.Cargo.NomeCargo,
-                funcionario.Cargo.DescricaoCargo
-            ),
-            new PatioResumoDto(
-                funcionario.Patio.PatioId,
-                funcionario.Patio.LocalizacaoPatio,
-                funcionario.Patio.NomePatio,
-                funcionario.Patio.DescricaoPatio
-            )
-        );
+        var funcionarioDto = FuncionarioReadDto.ToDto(funcionario);
 
         return Results.Ok(funcionarioDto);
     })
@@ -646,24 +518,17 @@ funcionarios.MapGet("/{id}", async ([Description("Identificador único do funcio
     .Produces(StatusCodes.Status404NotFound)
     .Produces(StatusCodes.Status500InternalServerError);
 
+
 // Retorna uma lista de todos os gerentes
 gerentes.MapGet("/", async (AppDbContext db) =>
     {
-        var gerentesDto = await db.Gerentes
+        var gerentesObtidos = await db.Gerentes
             .Include(g => g.Patio)
-            .Select(g => new GerenteReadDto(
-                g.GerenteId,
-                g.NomeGerente,
-                g.TelefoneGerente,
-                g.CpfGerente,
-                new PatioResumoDto(
-                    g.Patio.PatioId,
-                    g.Patio.LocalizacaoPatio,
-                    g.Patio.NomePatio,
-                    g.Patio.DescricaoPatio
-                )
-            ))
             .ToListAsync();
+        
+        var gerentesDto = gerentesObtidos
+            .Select(GerenteReadDto.ToDto)
+            .ToList();
 
         return gerentesDto.Count == 0 ? Results.NoContent() : Results.Ok(gerentesDto);
     })
@@ -684,18 +549,7 @@ gerentes.MapGet("/{id}", async ([Description("Identificador único do gerente")]
         if (gerente == null)
             return Results.NotFound("Nenhum gerente encontrado com ID fornecido.");
 
-        var gerenteDto = new GerenteReadDto(
-            gerente.GerenteId,
-            gerente.NomeGerente,
-            gerente.TelefoneGerente,
-            gerente.CpfGerente,
-            new PatioResumoDto(
-                gerente.Patio.PatioId,
-                gerente.Patio.LocalizacaoPatio,
-                gerente.Patio.NomePatio,
-                gerente.Patio.DescricaoPatio
-            )
-        );
+        var gerenteDto = GerenteReadDto.ToDto(gerente);
 
         return Results.Ok(gerenteDto);
     })
@@ -708,20 +562,13 @@ gerentes.MapGet("/{id}", async ([Description("Identificador único do gerente")]
 
 vagas.MapGet("/", async (AppDbContext db) =>
 {
-    var vagasDto = await db.Vagas
+    var vagasObtidas = await db.Vagas
         .Include(v => v.Setor)
-        .Select(v => new VagaReadDto(
-            v.VagaId,
-            v.NumeroVaga,
-            v.StatusOcupada,
-            new SetorResumoDto(
-                v.Setor.SetorId,
-                v.Setor.TipoSetor,
-                v.Setor.StatusSetor,
-                v.Setor.PatioId
-                )
-            ))
         .ToListAsync();
+    
+    var vagasDto = vagasObtidas
+        .Select(VagaResumoDto.ToDto)
+        .ToList();
     
     return vagasDto.Count == 0 ? Results.NoContent() : Results.Ok(vagasDto);
 })
@@ -743,48 +590,28 @@ vagas.MapGet("/{id}", async ([Description("Identificador único da vaga")] int i
         return Results.NotFound("Nenhuma vaga encontrada com ID fornecido.");
     }
 
-    var vagaDto = new VagaReadDto(
-        vaga.VagaId,
-        vaga.NumeroVaga,
-        vaga.StatusOcupada,
-        new SetorResumoDto(
-            vaga.Setor.SetorId,
-            vaga.Setor.TipoSetor,
-            vaga.Setor.StatusSetor,
-            vaga.Setor.PatioId
-        )
-    );
+    var vagaDto = VagaReadDto.ToDto(vaga);
     
     return Results.Ok(vagaDto);
 })
     .WithSummary("Retorna uma vaga pelo ID")
     .WithDescription("Retorna uma vaga a partir de um ID. Retorna 200 OK se a vaga for encontrada, ou erro se não for achada.")
-    .Produces<Vaga>(StatusCodes.Status200OK)
+    .Produces<VagaReadDto>(StatusCodes.Status200OK)
     .Produces(StatusCodes.Status404NotFound)
     .Produces(StatusCodes.Status500InternalServerError);
 
 // Retorna uma lista de todos os setores
 setores.MapGet("/", async (AppDbContext db) =>
     {
-        var setoresDto = await db.Setores
+        var setoresObtidos = await db.Setores
             .Include(s => s.Patio)
             .Include(s => s.Vagas)
-            .Select(s => new SetorReadDto(
-                s.SetorId,
-                s.TipoSetor,
-                s.StatusSetor,
-                new PatioResumoDto(
-                    s.Patio.PatioId,
-                    s.Patio.LocalizacaoPatio,
-                    s.Patio.NomePatio,
-                    s.Patio.DescricaoPatio
-                ),
-                s.Vagas.Select(v => new VagaResumoDto(
-                    v.VagaId,
-                    v.NumeroVaga,
-                    v.StatusOcupada)).ToList()
-            )).ToListAsync();
-        
+            .ToListAsync();
+
+        var setoresDto = setoresObtidos
+            .Select(SetorReadDto.ToDto)
+            .ToList();
+
         return setoresDto.Count == 0 ? Results.NoContent() : Results.Ok(setoresDto);
     })
     .WithSummary("Retorna a lista de setores")
@@ -807,20 +634,7 @@ setores.MapGet("/{id}", async ([Description("Identificador único do setor")] in
             return Results.NotFound("Nenhum setor encontrado com ID fornecido.");
         }
         
-        var setorDto = new SetorReadDto(
-                setor.SetorId,
-                setor.TipoSetor,
-                setor.StatusSetor,
-                new PatioResumoDto(
-                    setor.Patio.PatioId,
-                    setor.Patio.LocalizacaoPatio,
-                    setor.Patio.NomePatio,
-                    setor.Patio.DescricaoPatio
-                ),
-                setor.Vagas.Select(v => new VagaResumoDto(
-                    v.VagaId,
-                    v.NumeroVaga,
-                    v.StatusOcupada)).ToList());
+        var setorDto = SetorReadDto.ToDto(setor);
         
         return Results.Ok(setorDto);
     })
@@ -833,53 +647,26 @@ setores.MapGet("/{id}", async ([Description("Identificador único do setor")] in
 
 // Retorna uma lista de todas as movimentações
 movimentacoes.MapGet("/", async (AppDbContext db) =>
-    {
-        var movimentacoesDto = await db.Movimentacoes
-            .Include(m => m.Moto)
-            .ThenInclude(mo => mo.Cliente)
-            .Include(m => m.Vaga)
-            .ThenInclude(v => v.Setor)
-            .Select(m => new MovimentacaoReadDto(
-                m.MovimentacaoId,
-                m.DtEntrada,
-                m.DtSaida,
-                m.DescricaoMovimentacao,
-                new MotoReadDto(
-                    m.Moto.MotoId,
-                    m.Moto.PlacaMoto,
-                    m.Moto.ModeloMoto,
-                    m.Moto.SituacaoMoto,
-                    m.Moto.ChassiMoto,
-                    new ClienteResumoDto(
-                        m.Moto.Cliente.ClienteId,
-                        m.Moto.Cliente.NomeCliente,
-                        m.Moto.Cliente.TelefoneCliente,
-                        m.Moto.Cliente.SexoCliente,
-                        m.Moto.Cliente.EmailCliente,
-                        m.Moto.Cliente.CpfCliente
-                    )
-                ),
-                new VagaReadDto(
-                    m.Vaga.VagaId,
-                    m.Vaga.NumeroVaga,
-                    m.Vaga.StatusOcupada,
-                    new SetorResumoDto(
-                        m.Vaga.Setor.SetorId,
-                        m.Vaga.Setor.TipoSetor,
-                        m.Vaga.Setor.StatusSetor,
-                        m.Vaga.Setor.PatioId
-                    )
-                )
-            ))
-            .ToListAsync();
+{
+    var movimentacoesObtidas = await db.Movimentacoes
+        .Include(m => m.Moto)
+        .ThenInclude(mo => mo.Cliente)
+        .Include(m => m.Vaga)
+        .ThenInclude(v => v.Setor)
+        .ToListAsync();
 
-        return movimentacoesDto.Count == 0 ? Results.NoContent() : Results.Ok(movimentacoesDto);
-    })
+    var movimentacoesDto = movimentacoesObtidas
+        .Select(MovimentacaoReadDto.ToDto)
+        .ToList();
+
+    return movimentacoesDto.Count == 0 ? Results.NoContent() : Results.Ok(movimentacoesDto);
+})
     .WithSummary("Retorna a lista de movimentações")
     .WithDescription("Retorna a lista de movimentações feitas, com dados da moto, cliente e vaga.")
     .Produces<List<MovimentacaoReadDto>>(StatusCodes.Status200OK)
     .Produces(StatusCodes.Status204NoContent)
     .Produces(StatusCodes.Status500InternalServerError);
+
 
 // Retorna todas as movimentações de uma moto específica pelo ID
 movimentacoes.MapGet("/por-moto/{motoId}", async ([Description("ID único da Moto")] int motoId, AppDbContext db) =>
@@ -892,45 +679,17 @@ movimentacoes.MapGet("/por-moto/{motoId}", async ([Description("ID único da Mot
     if (moto == null)
         return Results.NotFound("Moto não encontrada.");
     
-    var movimentacoesDto = await db.Movimentacoes
+    var movimentacoesObtidas = await db.Movimentacoes
         .Where(m => m.MotoId == motoId)
         .Include(m => m.Moto)
         .ThenInclude(mo => mo.Cliente)
         .Include(m => m.Vaga)
         .ThenInclude(v => v.Setor)
-        .Select(m => new MovimentacaoReadDto(
-            m.MovimentacaoId,
-            m.DtEntrada,
-            m.DtSaida,
-            m.DescricaoMovimentacao,
-            new MotoReadDto(
-                m.Moto.MotoId,
-                m.Moto.PlacaMoto,
-                m.Moto.ModeloMoto,
-                m.Moto.SituacaoMoto,
-                m.Moto.ChassiMoto,
-                new ClienteResumoDto(
-                    m.Moto.Cliente.ClienteId,
-                    m.Moto.Cliente.NomeCliente,
-                    m.Moto.Cliente.TelefoneCliente,
-                    m.Moto.Cliente.SexoCliente,
-                    m.Moto.Cliente.EmailCliente,
-                    m.Moto.Cliente.CpfCliente
-                )
-            ),
-            new VagaReadDto(
-                m.Vaga.VagaId,
-                m.Vaga.NumeroVaga,
-                m.Vaga.StatusOcupada,
-                new SetorResumoDto(
-                    m.Vaga.Setor.SetorId,
-                    m.Vaga.Setor.TipoSetor,
-                    m.Vaga.Setor.StatusSetor,
-                    m.Vaga.Setor.PatioId
-                )
-            )
-        ))
         .ToListAsync();
+
+    var movimentacoesDto = movimentacoesObtidas
+        .Select(MovimentacaoReadDto.ToDto)
+        .ToList();
 
     return movimentacoesDto.Count == 0 ? Results.NoContent() : Results.Ok(movimentacoesDto);
 })
@@ -959,38 +718,7 @@ movimentacoes.MapGet("/{id}", async ([Description("Identificador único de movim
         return Results.NotFound("Nenhuma movimentação encontrada com o ID fornecido.");  
     }
     
-    var movimentacaoDto = new MovimentacaoReadDto(
-        movimentacao.MovimentacaoId,
-        movimentacao.DtEntrada,
-        movimentacao.DtSaida,
-        movimentacao.DescricaoMovimentacao,
-        new MotoReadDto(
-            movimentacao.Moto.MotoId,
-            movimentacao.Moto.PlacaMoto,
-            movimentacao.Moto.ModeloMoto,
-            movimentacao.Moto.SituacaoMoto,
-            movimentacao.Moto.ChassiMoto,
-            new ClienteResumoDto(
-                movimentacao.Moto.Cliente.ClienteId,
-                movimentacao.Moto.Cliente.NomeCliente,
-                movimentacao.Moto.Cliente.TelefoneCliente,
-                movimentacao.Moto.Cliente.SexoCliente,
-                movimentacao.Moto.Cliente.EmailCliente,
-                movimentacao.Moto.Cliente.CpfCliente
-            )
-        ),
-        new VagaReadDto(
-            movimentacao.Vaga.VagaId,
-            movimentacao.Vaga.NumeroVaga,
-            movimentacao.Vaga.StatusOcupada,
-            new SetorResumoDto(
-                movimentacao.Vaga.Setor.SetorId,
-                movimentacao.Vaga.Setor.TipoSetor,
-                movimentacao.Vaga.Setor.StatusSetor,
-                movimentacao.Vaga.Setor.PatioId
-            )
-        )
-    );
+    var movimentacaoDto = MovimentacaoReadDto.ToDto(movimentacao);
     
     return Results.Ok(movimentacaoDto); 
 })
@@ -1093,39 +821,7 @@ movimentacoes.MapPost("/", async (MovimentacaoPostDto dto, AppDbContext db, IHub
     db.Movimentacoes.Add(movimentacao);
     await db.SaveChangesAsync();
     
-    
-    var movimentacaoDto = new MovimentacaoReadDto(
-        movimentacao.MovimentacaoId,
-        movimentacao.DtEntrada,
-        movimentacao.DtSaida,
-        movimentacao.DescricaoMovimentacao,
-        new MotoReadDto(
-            movimentacao.Moto.MotoId,
-            movimentacao.Moto.PlacaMoto,
-            movimentacao.Moto.ModeloMoto,
-            movimentacao.Moto.SituacaoMoto,
-            movimentacao.Moto.ChassiMoto,
-            new ClienteResumoDto(
-                movimentacao.Moto.Cliente.ClienteId,
-                movimentacao.Moto.Cliente.NomeCliente,
-                movimentacao.Moto.Cliente.TelefoneCliente,
-                movimentacao.Moto.Cliente.SexoCliente,
-                movimentacao.Moto.Cliente.EmailCliente,
-                movimentacao.Moto.Cliente.CpfCliente
-            )
-        ),
-        new VagaReadDto(
-            movimentacao.Vaga.VagaId,
-            movimentacao.Vaga.NumeroVaga,
-            movimentacao.Vaga.StatusOcupada,
-            new SetorResumoDto(
-                movimentacao.Vaga.Setor.SetorId,
-                movimentacao.Vaga.Setor.TipoSetor,
-                movimentacao.Vaga.Setor.StatusSetor,
-                movimentacao.Vaga.Setor.PatioId
-            )
-        )
-    );
+    var movimentacaoDto = MovimentacaoReadDto.ToDto(movimentacao);
     
     int patioId = vaga.Setor.PatioId;
     
