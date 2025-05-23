@@ -1100,6 +1100,11 @@ Códigos de Resposta
 
 ## Dockerfile
 
+#### Para que a API funcione na nuvem, é necessário remover o comentário desta linha (este passo foi utilizado na construção da imagem enviada ao Docker Hub (dinozin/sprint1-api-mottion:latest). Se for utilizar a imagem do Docker Hub, ignorar este passo):
+```code
+//builder.WebHost.UseUrls("http://0.0.0.0:5147");
+```
+
 ### Estrutura do Dockerfile para a matéria de DEVOPS TOOLS & CLOUD COMPUTING:
 #### Deve ser executado na raiz do projeto (não dentro da API).
 ```
@@ -1145,12 +1150,6 @@ ENTRYPOINT ["dotnet", "Sprint1-API.dll"]
 ### Observação: A API funciona normalmente na nuvem, mas para que o Scalar funcione na Azure sem precisar criar um novo servidor pelo Client API, é necessário alterar em Program.cs a seguinte linha de código (antes de construir a imagem): 
 ```
 builder.WebHost.UseUrls("http://<ip-publico-da-maquina-virtual>:5147");
-```
-
-### Ou caso queira construir a imagem antes da criação da VM, basta retirar o comentário da linha (será necessário criar um novo servidor pelo Client API):
-#### Este passo foi utilizado na construção da imagem enviada ao Docker Hub (dinozin/sprint1-api-mottion:latest).
-```code
-//builder.WebHost.UseUrls("http://0.0.0.0:5147");
 ```
 
 ### E depois construir a imagem e fazer o push em seu Docker Hub:
