@@ -1101,7 +1101,7 @@ Códigos de Resposta
 ## Dockerfile
 
 ### Estrutura do Dockerfile para a matéria de DEVOPS TOOLS & CLOUD COMPUTING:
-
+#### Deve ser executado na raiz do projeto (não dentro da API).
 ```
 # Etapa 1: build da aplicação usando imagem Alpine
 FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
