@@ -12,7 +12,7 @@ public class VagaService
         _db = db;
     }
 
-    public async Task<IResult> GetAllVagas()
+    public async Task<IResult> GetAllVagasAsync()
     {
         var vagas = await _db.Vagas
             .Include(v => v.Setor)
@@ -25,7 +25,7 @@ public class VagaService
         return vagasDto.Any() ? Results.Ok(vagasDto) : Results.NoContent();
     }
 
-    public async Task<IResult> GetVagaById(int id)
+    public async Task<IResult> GetVagaByIdAsync(int id)
     {
         var vaga = await _db.Vagas
             .Include(v => v.Setor)

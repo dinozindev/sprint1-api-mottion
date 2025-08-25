@@ -12,7 +12,7 @@ public class SetorService
         _db = db;
     }
 
-    public async Task<IResult> GetAllSetores()
+    public async Task<IResult> GetAllSetoresAsync()
     {
         var setores = await _db.Setores
             .Include(s => s.Patio)
@@ -26,12 +26,12 @@ public class SetorService
         return setoresDto.Any() ? Results.Ok(setoresDto) : Results.NoContent();
     }
 
-    public async Task<IResult> GetSetorById(int id)
+    public async Task<IResult> GetSetorByIdAsync(int id)
     {
         var setor = await _db.Setores
             .Include(s => s.Patio)
             .Include(s => s.Vagas)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(s => s.SetorId == id);
         
         return setor is null ? Results.NotFound("Nenhum setor encontrado com ID informado.") : Results.Ok(SetorReadDto.ToDto(setor));
     }

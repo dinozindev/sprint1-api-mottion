@@ -10,14 +10,14 @@ public static class VagaEndpoints
     {
         var vagas = app.MapGroup("/vagas").WithTags("Vagas");
         
-        vagas.MapGet("/", async (VagaService service) => await service.GetAllVagas())
+        vagas.MapGet("/", async (VagaService service) => await service.GetAllVagasAsync())
             .WithSummary("Retorna a lista de vagas")
             .WithDescription("Retorna a lista de vagas cadastradas.")
             .Produces<List<VagaReadDto>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status500InternalServerError);
         
-        vagas.MapGet("/{id:int}", async ([Description("Identificador único de Vaga")] int id, VagaService service) => await service.GetVagaById(id))
+        vagas.MapGet("/{id:int}", async ([Description("Identificador único de Vaga")] int id, VagaService service) => await service.GetVagaByIdAsync(id))
             .WithSummary("Retorna um patio pelo ID")
             .WithDescription("Retorna um patio a partir de um ID. Retorna 200 OK se o patio for encontrado, ou erro se não for achado.")
             .Produces<PatioReadDto>(StatusCodes.Status200OK)
