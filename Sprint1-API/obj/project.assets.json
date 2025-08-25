@@ -8987,11 +8987,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Aulas\\sprint1-api-mottion\\Sprint1-API\\Sprint1-API.csproj",
+      "projectUniqueName": "C:\\Users\\pugpl\\RiderProjects\\2tdsbProjetos\\Sprint1-API\\Sprint1-API.csproj",
       "projectName": "Sprint1-API",
-      "projectPath": "D:\\Aulas\\sprint1-api-mottion\\Sprint1-API\\Sprint1-API.csproj",
+      "projectPath": "C:\\Users\\pugpl\\RiderProjects\\2tdsbProjetos\\Sprint1-API\\Sprint1-API.csproj",
       "packagesPath": "C:\\Users\\pugpl\\.nuget\\packages\\",
-      "outputPath": "D:\\Aulas\\sprint1-api-mottion\\Sprint1-API\\obj\\",
+      "outputPath": "C:\\Users\\pugpl\\RiderProjects\\2tdsbProjetos\\Sprint1-API\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\pugpl\\AppData\\Roaming\\NuGet\\NuGet.Config",

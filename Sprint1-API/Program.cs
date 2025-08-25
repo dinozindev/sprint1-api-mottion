@@ -59,9 +59,6 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSignalR();
 
-// usado para poder acessar a API na Azure (Tire o comentário somente se for utilizar na Azure criando a imagem)
-//builder.WebHost.UseUrls("http://0.0.0.0:5147");
-
 var app = builder.Build();
 
 //  habilita o CORS

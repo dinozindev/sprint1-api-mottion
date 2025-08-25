@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 using Sprache;
 using Sprint1_API.Dtos;
 using Sprint1_API.Model;
@@ -162,7 +163,7 @@ public class MotoService
         // verifica se a placa está no formato correto
         if (!string.IsNullOrWhiteSpace(dto.PlacaMoto))
         {
-            if (!System.Text.RegularExpressions.Regex.IsMatch(dto.PlacaMoto, @"^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$"))
+            if (!System.Text.RegularExpressions.Regex.IsMatch(dto.PlacaMoto, @"^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$", RegexOptions.None, TimeSpan.FromMilliseconds(100)))
             {
                 return Results.BadRequest("Placa inválida. Use o formato ABC1234 ou ABC1D23.");
             }
@@ -177,7 +178,7 @@ public class MotoService
         
         // verifica se o Chassi está no formato correto
         if (string.IsNullOrWhiteSpace(dto.ChassiMoto) ||
-            !System.Text.RegularExpressions.Regex.IsMatch(dto.ChassiMoto, @"^[A-HJ-NPR-Z0-9]{17}$"))
+            !System.Text.RegularExpressions.Regex.IsMatch(dto.ChassiMoto, @"^[A-HJ-NPR-Z0-9]{17}$", RegexOptions.None, TimeSpan.FromMilliseconds(100)))
         {
             return Results.BadRequest("Chassi inválido. Deve conter 17 caracteres alfanuméricos, sem I, O ou Q.");
         }
