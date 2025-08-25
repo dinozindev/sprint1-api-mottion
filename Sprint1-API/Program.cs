@@ -101,4 +101,4 @@ app.MapSetorEndpoints();
 // endpoints de Movimentação
 app.MapMovimentacaoEndpoints();
 
-app.Run();
+await app.RunAsync();

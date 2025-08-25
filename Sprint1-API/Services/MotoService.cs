@@ -75,7 +75,7 @@ public class MotoService
             ),
             ultimaMovimentacao.DtEntrada,
             ultimaMovimentacao.DtSaida,
-            ultimaMovimentacao.DtSaida == null ? true : false
+            ultimaMovimentacao.DtSaida is null
         );
 
         return Results.Ok(ultimaPosicao);
