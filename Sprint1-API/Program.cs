@@ -26,6 +26,8 @@ builder.Services.AddScoped<PatioService>();
 builder.Services.AddScoped<CargoService>();
 builder.Services.AddScoped<FuncionarioService>();
 builder.Services.AddScoped<GerenteService>();
+builder.Services.AddScoped<VagaService>();
+builder.Services.AddScoped<SetorService>();
 
 // define um limite de requisições durante um determinado período.
 builder.Services.AddRateLimiter(options =>
@@ -76,10 +78,7 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-var vagas = app.MapGroup("/vagas").WithTags("Vagas");
 var movimentacoes = app.MapGroup("/movimentacoes").WithTags("Movimentacoes");
-var gerentes = app.MapGroup("/gerentes").WithTags("Gerentes");
-var setores = app.MapGroup("/setores").WithTags("Setores");
 
 // endpoints de Cliente
 app.MapClienteEndpoints();
@@ -99,91 +98,11 @@ app.MapFuncionarioEndpoints();
 // endpoints de Gerente
 app.MapGerenteEndpoints();
 
+// endpoints de Vaga
+app.MapVagaEndpoints();
 
-vagas.MapGet("/", async (AppDbContext db) =>
-{
-    var vagasObtidas = await db.Vagas
-        .Include(v => v.Setor)
-        .ToListAsync();
-    
-    var vagasDto = vagasObtidas
-        .Select(VagaResumoDto.ToDto)
-        .ToList();
-    
-    return vagasDto.Count == 0 ? Results.NoContent() : Results.Ok(vagasDto);
-})
-    .WithSummary("Retorna a lista de vagas")
-    .WithDescription("Retorna a lista de vagas cadastradas.")
-    .Produces<List<VagaReadDto>>(StatusCodes.Status200OK)
-    .Produces(StatusCodes.Status204NoContent)
-    .Produces(StatusCodes.Status500InternalServerError);
-
-// Retorna uma vaga a partir do ID
-vagas.MapGet("/{id}", async ([Description("Identificador único da vaga")] int id, AppDbContext db) =>
-{
-    var vaga = await db.Vagas
-        .Include(v => v.Setor)
-        .FirstOrDefaultAsync(v => v.VagaId == id);
-
-    if (vaga == null)
-    {
-        return Results.NotFound("Nenhuma vaga encontrada com ID fornecido.");
-    }
-
-    var vagaDto = VagaReadDto.ToDto(vaga);
-    
-    return Results.Ok(vagaDto);
-})
-    .WithSummary("Retorna uma vaga pelo ID")
-    .WithDescription("Retorna uma vaga a partir de um ID. Retorna 200 OK se a vaga for encontrada, ou erro se não for achada.")
-    .Produces<VagaReadDto>(StatusCodes.Status200OK)
-    .Produces(StatusCodes.Status404NotFound)
-    .Produces(StatusCodes.Status500InternalServerError);
-
-// Retorna uma lista de todos os setores
-setores.MapGet("/", async (AppDbContext db) =>
-    {
-        var setoresObtidos = await db.Setores
-            .Include(s => s.Patio)
-            .Include(s => s.Vagas)
-            .ToListAsync();
-
-        var setoresDto = setoresObtidos
-            .Select(SetorReadDto.ToDto)
-            .ToList();
-
-        return setoresDto.Count == 0 ? Results.NoContent() : Results.Ok(setoresDto);
-    })
-    .WithSummary("Retorna a lista de setores")
-    .WithDescription("Retorna a lista de setores cadastrados.")
-    .Produces<List<SetorReadDto>>(StatusCodes.Status200OK)
-    .Produces(StatusCodes.Status204NoContent)
-    .Produces(StatusCodes.Status500InternalServerError);
-
-
-// Retorna um setor a partir do ID
-setores.MapGet("/{id}", async ([Description("Identificador único do setor")] int id, AppDbContext db) =>
-    {
-        var setor = await db.Setores
-            .Include(s => s.Patio)
-            .Include(s => s.Vagas)
-            .FirstOrDefaultAsync(s => s.SetorId == id);
-
-        if (setor == null)
-        {
-            return Results.NotFound("Nenhum setor encontrado com ID fornecido.");
-        }
-        
-        var setorDto = SetorReadDto.ToDto(setor);
-        
-        return Results.Ok(setorDto);
-    })
-    .WithSummary("Retorna um setor pelo ID")
-    .WithDescription("Retorna um setor a partir de um ID. Retorna 200 OK se o setor for encontrado, ou erro se não for achado.")
-    .Produces<SetorReadDto>(StatusCodes.Status200OK)
-    .Produces(StatusCodes.Status404NotFound)
-    .Produces(StatusCodes.Status500InternalServerError);
-
+// endpoints de Setor
+app.MapSetorEndpoints();
 
 // Retorna uma lista de todas as movimentações
 movimentacoes.MapGet("/", async (AppDbContext db) =>
